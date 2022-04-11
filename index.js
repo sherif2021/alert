@@ -36,7 +36,7 @@ const schools = [
     },
     {
         'name': 'farouk', 'email': 'faroukshahin30@gmail.com',
-        'late': 30.788511, 'long': 30.987529,
+        'late': 30.7935582, 'long': 30.9870705,
 
     },
 ]
@@ -76,7 +76,7 @@ app.post('/', upload.array('files'), async (req, res) => {
         for (const school of schools) {
             const distance = caclDistance(school.late, late, school.long, long)
             console.log(`${school.name} => ${distance}`)
-            
+
             const result = distance <= .5
 
             if (result) {
