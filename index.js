@@ -1,0 +1,145 @@
+
+const express = require('express')
+const http = require('http')
+const app = express()
+const server = http.createServer(app);
+const multer = require('multer');
+const path = require('path');
+const nodemailer = require('nodemailer');
+
+const email = 'shiref20500@gmail.com'
+const emailPassword = '69961148'
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: false,
+    auth: {
+        user: email,
+        pass: emailPassword
+    }
+});
+
+const schools = [
+
+    {
+        'name': 'ajory',
+        'email': 'ah.ajory@gmail.com',
+        'late': 32.1868682,
+        'long': 35.2854447
+    },
+    {
+        'name': 'sherif', 'email': 'shiref2021@gmail.com',
+        'late': 37.4218881, 'long': -122.0830588,
+
+    },
+    {
+        'name': 'farouk', 'email': 'faroukshahin30@gmail.com',
+        'late': 30.788511, 'long': 30.987529,
+
+    },
+]
+
+const serverUrl = 'http://ajory.online:3333/'
+
+app.use(express.static(__dirname + '/public'))
+
+
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
+
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/');
+    },
+
+    filename: function (req, file, cb) {
+        const filePath = file.fieldname + '-' + Date.now() + path.extname(file.originalname)
+        cb(null, filePath);
+        if (!req.paths) req.paths = []
+        req.paths.push(serverUrl + filePath)
+    }
+});
+
+var upload = multer({ storage: storage })
+
+
+app.post('/', upload.array('files'), async (req, res) => {
+
+    try {
+        const paths = req.paths
+        const { type, message, late, long } = req.body
+
+        for (const school of schools) {
+            const distance = caclDistance(school.late, late, school.long, long)
+            const result = distance <= .5
+
+            if (result) {
+                var mailOptions = {
+                    from: email,
+                    to: school.email,
+                    subject: 'تم الابلاغ عن حادث',
+                    text: `
+                    تم الابلاغ عن حادث  ${type}
+
+                    ونص الرسالة 
+                    ${message}
+
+                    `
+                };
+                if (path) {
+                    mailOptions.text += `والصور`
+                    paths.forEach((path) => {
+                        mailOptions.text += '\n' + path
+                    })
+                }
+                transporter.sendMail(mailOptions)
+                break;
+            }
+        }
+
+        res.json({
+            'result': 'sucess'
+        })
+    } catch (e) {
+        console.log(e)
+        res.sendStatus(500)
+    }
+
+});
+
+
+server.listen(process.env.PORT || 3333, () => {
+    console.log(`Server started on port ${server.address().port} :)`);
+});
+
+function caclDistance(lat1,
+    lat2, lon1, lon2) {
+
+    // The math module contains a function
+    // named toRadians which converts from
+    // degrees to radians.
+    lon1 = lon1 * Math.PI / 180;
+    lon2 = lon2 * Math.PI / 180;
+    lat1 = lat1 * Math.PI / 180;
+    lat2 = lat2 * Math.PI / 180;
+
+    // Haversine formula
+    let dlon = lon2 - lon1;
+    let dlat = lat2 - lat1;
+    let a = Math.pow(Math.sin(dlat / 2), 2)
+        + Math.cos(lat1) * Math.cos(lat2)
+        * Math.pow(Math.sin(dlon / 2), 2);
+
+    let c = 2 * Math.asin(Math.sqrt(a));
+
+    // Radius of earth in kilometers. Use 3956
+    // for miles
+    let r = 6371;
+
+    // calculate the result
+    return (c * r);
+}
+
