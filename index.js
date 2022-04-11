@@ -7,8 +7,8 @@ const multer = require('multer');
 const path = require('path');
 const nodemailer = require('nodemailer');
 
-const email = 'shiref20500@gmail.com'
-const emailPassword = '69961148'
+const email = 'ajory.it@gmail.com'
+const emailPassword = '0599998837A#'
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
