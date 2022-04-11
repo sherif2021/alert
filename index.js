@@ -72,11 +72,15 @@ app.post('/', upload.array('files'), async (req, res) => {
         const paths = req.paths
         const { type, message, late, long } = req.body
 
+        var findSchool = false
         for (const school of schools) {
             const distance = caclDistance(school.late, late, school.long, long)
+            console.log(`${school.name} => ${distance}`)
+            
             const result = distance <= .5
 
             if (result) {
+                findSchool = true
                 var mailOptions = {
                     from: email,
                     to: school.email,
@@ -101,7 +105,7 @@ app.post('/', upload.array('files'), async (req, res) => {
         }
 
         res.json({
-            'result': 'sucess'
+            'message': findSchool ? 'The Message And Pictures sent to school.' : 'not find any school'
         })
     } catch (e) {
         console.log(e)
