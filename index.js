@@ -105,7 +105,7 @@ app.post('/', upload.array('files'), async (req, res) => {
         }
 
         res.json({
-            'message': findSchool ? 'The Message And Pictures sent to school.' : 'not find any school'
+            'message': findSchool ? 'تم ارسال البيانات الي اقرب مدرسة' : 'لا يوجد اي مدرسة قريبة'
         })
     } catch (e) {
         console.log(e)
