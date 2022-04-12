@@ -6,9 +6,12 @@ const server = http.createServer(app);
 const multer = require('multer');
 const path = require('path');
 const nodemailer = require('nodemailer');
+const schools = require('./schools.json')
+
 
 const email = 'ajory.it@gmail.com'
 const emailPassword = '0599998837A#'
+
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -21,25 +24,6 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-const schools = [
-
-    {
-        'name': 'ajory',
-        'email': 'ah.ajory@gmail.com',
-        'late': 32.1868682,
-        'long': 35.2854447
-    },
-    {
-        'name': 'sherif', 'email': 'shiref2021@gmail.com',
-        'late': 37.4218881, 'long': -122.0830588,
-
-    },
-    {
-        'name': 'farouk', 'email': 'faroukshahin30@gmail.com',
-        'late': 30.7935582, 'long': 30.9870705,
-
-    },
-]
 
 const serverUrl = 'http://ajory.online:3333/'
 
@@ -75,7 +59,7 @@ app.post('/', upload.array('files'), async (req, res) => {
         var findSchool = false
         for (const school of schools) {
             const distance = caclDistance(school.late, late, school.long, long)
-            console.log(`${school.name} => ${distance}`)
+            //console.log(`${school.name} => ${distance}`)
 
             const result = distance <= .5
 
