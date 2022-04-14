@@ -58,6 +58,7 @@ app.post('/', upload.array('files'), async (req, res) => {
 
         var findSchool = false
         for (const school of schools) {
+
             const distance = caclDistance(school.late, late, school.long, long)
             //console.log(`${school.name} => ${distance}`)
 
@@ -68,19 +69,26 @@ app.post('/', upload.array('files'), async (req, res) => {
                 var mailOptions = {
                     from: email,
                     to: school.email,
-                    subject: 'تم الابلاغ عن حادث',
+                    subject: 'דיווח חדש מל"ב בקליק',
                     text: `
-                    تم الابلاغ عن حادث  ${type}
-
-                    ونص الرسالة 
+                    שלום רב,
+                    התקבל דיווח אירוע חירום מסוג ${type}.
+                    להלן פרטים נוספים אודות הדיווח:
+                    
                     ${message}
 
-                    `
+                    מצורף בזאת תמונות מאיזור הדיווח לשימושך.
+                    נא טיפולך בהקדם.
+                    תודה רבה,
+                    מערכת ל"ב בקליק.
+                    `,
+                    attachments: []
+
                 };
-                if (path) {
-                    mailOptions.text += `والصور`
-                    paths.forEach((path) => {
-                        mailOptions.text += '\n' + path
+                for (var i = 0; i < path.length; i++) {
+                    mailOptions.attachments.push({
+                        filename: i,
+                        path: paths[i]
                     })
                 }
                 transporter.sendMail(mailOptions)
@@ -89,7 +97,7 @@ app.post('/', upload.array('files'), async (req, res) => {
         }
 
         res.json({
-            'message': findSchool ? 'تم ارسال البيانات الي اقرب مدرسة' : 'لا يوجد اي مدرسة قريبة'
+            'message': findSchool ? 'האירוע דווח בהצלחה ויטופל על ידי הגורמים הרלוונטים במוסד' : 'אתה לא נמצא באיזור המותר לדיווח אירועים במערכת'
         })
     } catch (e) {
         console.log(e)
