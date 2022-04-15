@@ -88,7 +88,7 @@ app.post('/', upload.array('files'), async (req, res) => {
                 };
                 for (var i = 0; i < paths.length; i++) {
                     mailOptions.attachments.push({
-                        filename: i.toString(),
+                        filename: `${i}.jpg`,
                         path: paths[i]
                     })
                 }
