@@ -9,8 +9,8 @@ const nodemailer = require('nodemailer');
 const schools = require('./schools.json')
 
 
-const email = 'ajory.it@gmail.com'
-const emailPassword = '0599998837A#'
+const email = 'maharat.lb.click@gmail.com'
+const emailPassword = 'Maharat1020'
 
 
 const transporter = nodemailer.createTransport({
