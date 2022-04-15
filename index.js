@@ -92,6 +92,7 @@ app.post('/', upload.array('files'), async (req, res) => {
                         path: paths[i]
                     })
                 }
+                console.log(mailOptions)
                 transporter.sendMail(mailOptions)
                 break;
             }
