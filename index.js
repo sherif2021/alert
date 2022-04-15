@@ -27,6 +27,7 @@ const transporter = nodemailer.createTransport({
 
 const serverUrl = 'http://ajory.online:3333/'
 
+
 app.use(express.static(__dirname + '/public'))
 
 
