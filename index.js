@@ -156,7 +156,7 @@ app.post('/', upload.array('files'), async (req, res) => {
         for (const school of schools) {
 
             const distance = caclDistance(school.late, late, school.long, long)
-            //  console.log(`${school.name} => ${distance}`)
+            console.log(`${school.name} => ${distance}`)
 
             const result = distance <= .5
 
