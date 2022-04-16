@@ -6,7 +6,23 @@ const server = http.createServer(app);
 const multer = require('multer');
 const path = require('path');
 const nodemailer = require('nodemailer');
-const schools = require('./schools.json')
+const mongoose = require('mongoose')
+const school_model = require('./school_model')
+
+require("dotenv").config();
+
+mongoose.connect(process.env.MONGODB_URI,
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+    .then(() => {
+        console.log('Database Connected')
+
+    }).catch((e) => {
+        console.error(e)
+    });
+
 
 
 const email = 'maharat.lb.click@gmail.com'
@@ -51,6 +67,82 @@ const storage = multer.diskStorage({
 var upload = multer({ storage: storage })
 
 
+
+app.get('/schools', async (req, res) => {
+
+    try {
+
+        const schools = await school_model.find({})
+
+        res.json(schools)
+
+
+    } catch (e) {
+
+        res.json({
+            'status': false,
+            'message': e
+        })
+    }
+})
+
+app.post('/school', async (req, res) => {
+
+    try {
+
+        const schoolObject = new school_model(req.body)
+        const result = await schoolObject.save()
+
+        res.json(result)
+
+    } catch (e) {
+
+        res.json({
+            'status': false,
+            'message': e
+        })
+    }
+})
+
+app.put('/school', async (req, res) => {
+
+    try {
+
+        const result = await school_model.findOneAndUpdate({ _id: req.body.id }, req.body, { returnOriginal: false })
+
+
+        res.json({
+            'status': true,
+            'result': result
+        })
+
+    } catch (e) {
+
+        res.json({
+            'status': false,
+            'message': e
+        })
+    }
+})
+app.delete('/school/:id', async (req, res) => {
+
+    try {
+
+        const result = await school_model.findOneAndDelete({ _id: req.params.id })
+
+        res.json({
+            'status': true,
+            'result': result ? 'success' : 'failed'
+        })
+
+    } catch (e) {
+
+        res.json({
+            'status': false,
+            'message': e
+        })
+    }
+})
 app.post('/', upload.array('files'), async (req, res) => {
 
     try {
@@ -58,10 +150,13 @@ app.post('/', upload.array('files'), async (req, res) => {
         const { type, message, late, long } = req.body
 
         var findSchool = false
+
+        const schools = await school_model.find({})
+
         for (const school of schools) {
 
             const distance = caclDistance(school.late, late, school.long, long)
-          //  console.log(`${school.name} => ${distance}`)
+            //  console.log(`${school.name} => ${distance}`)
 
             const result = distance <= .5
 
