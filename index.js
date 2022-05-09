@@ -7,7 +7,7 @@ const multer = require('multer');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const mongoose = require('mongoose')
-const school_model = require('./school_model')
+const school_model = require('./models/school_model')
 
 require("dotenv").config();
 
@@ -42,14 +42,14 @@ const transporter = nodemailer.createTransport({
 
 
 const serverUrl = 'http://ajory.online:3333/'
-
+//const serverUrl = 'http://localhost:3333/'
 
 app.use(express.static(__dirname + '/public'))
 
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
-
+app.use('/associations', require('./routes/associations'))
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -57,10 +57,12 @@ const storage = multer.diskStorage({
     },
 
     filename: function (req, file, cb) {
+
+
         const filePath = file.fieldname + '-' + Date.now() + path.extname(file.originalname)
         cb(null, filePath);
         if (!req.paths) req.paths = []
-        req.paths.push(serverUrl + filePath)
+        req.paths.push({ url: serverUrl + filePath, ex: path.extname(file.originalname) })
     }
 });
 
@@ -147,16 +149,14 @@ app.post('/', upload.array('files'), async (req, res) => {
 
     try {
         const paths = req.paths
-        const { type, message, late, long } = req.body
+        const { type, message, late, long, how_dangerous } = req.body
 
         var findSchool = false
-
         const schools = await school_model.find({})
 
         for (const school of schools) {
 
             const distance = caclDistance(school.late, late, school.long, long)
-            console.log(`${school.name} => ${distance}`)
 
             const result = distance <= .5
 
@@ -171,6 +171,10 @@ app.post('/', upload.array('files'), async (req, res) => {
                     התקבל דיווח אירוע חירום מסוג ${type}.
                     להלן פרטים נוספים אודות הדיווח:
                     
+                    כמה מסוכן
+                    ${how_dangerous}
+
+
                     ${message}
 
                     מצורף בזאת תמונות מאיזור הדיווח לשימושך.
@@ -183,8 +187,8 @@ app.post('/', upload.array('files'), async (req, res) => {
                 };
                 for (var i = 0; i < paths.length; i++) {
                     mailOptions.attachments.push({
-                        filename: `${i}.jpg`,
-                        path: paths[i]
+                        filename: i + paths[i].ex,
+                        path: paths[i].url
                     })
                 }
                 transporter.sendMail(mailOptions)
