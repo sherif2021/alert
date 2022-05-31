@@ -7,6 +7,7 @@ const associationSchema = new mongoose.Schema({
     phone_1: { type: String, default: '' },
     phone_2: { type: String, default: '' },
     website: { type: String, default: '' },
+    desc: { type: String, default: '' },
 }, { versionKey: false, timestamps: true, })
 
 module.exports = mongoose.model("associations", associationSchema);
