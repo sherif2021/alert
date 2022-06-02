@@ -159,6 +159,10 @@ app.post('/', upload.array('files'), async (req, res) => {
 
             const distance = caclDistance(school.late, late, school.long, long)
 
+            console.log(school._doc.name)
+            console.log(distance)
+            console.log('_________')
+
             if (selectedSchool == null || distance < selectedSchool.distance) {
                 school._doc.distance = distance
                 selectedSchool = school._doc
@@ -166,9 +170,7 @@ app.post('/', upload.array('files'), async (req, res) => {
         }
 
         if (selectedSchool != null) {
-
-            console.log(selectedSchool.name)
-            console.log(selectedSchool.distance)
+            console.log('selected ' + selectedSchool.name)
             var mailOptions = {
                 from: email,
                 to: selectedSchool.email,
