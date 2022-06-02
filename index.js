@@ -161,12 +161,14 @@ app.post('/', upload.array('files'), async (req, res) => {
 
             if (selectedSchool == null || distance < selectedSchool._doc.distance) {
                 school._doc.distance = distance
-                selectedSchool = school
+                selectedSchool = school._doc
             }
         }
 
         if (selectedSchool != null) {
 
+            console.log(selectedSchool.name)
+            console.log(selectedSchool.distance)
             var mailOptions = {
                 from: email,
                 to: selectedSchool.email,
