@@ -190,12 +190,13 @@ app.post('/', upload.array('files'), async (req, res) => {
                 attachments: []
 
             };
-            for (var i = 0; i < paths.length; i++) {
-                mailOptions.attachments.push({
-                    filename: i + paths[i].ex,
-                    path: paths[i].url
-                })
-            }
+            if (paths)
+                for (var i = 0; i < paths.length; i++) {
+                    mailOptions.attachments.push({
+                        filename: i + paths[i].ex,
+                        path: paths[i].url
+                    })
+                }
             transporter.sendMail(mailOptions)
         }
 
