@@ -159,7 +159,7 @@ app.post('/', upload.array('files'), async (req, res) => {
 
             const distance = caclDistance(school.late, late, school.long, long)
 
-            if (selectedSchool == null || distance < selectedSchool._doc.distance) {
+            if (selectedSchool == null || distance < selectedSchool.distance) {
                 school._doc.distance = distance
                 selectedSchool = school._doc
             }
