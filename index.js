@@ -151,22 +151,27 @@ app.post('/', upload.array('files'), async (req, res) => {
         const paths = req.paths
         const { type, message, late, long, how_dangerous } = req.body
 
-        var findSchool = false
+        var selectedSchool = null
+
         const schools = await school_model.find({})
 
-        for (const school of schools) {
+        for (var school of schools) {
 
             const distance = caclDistance(school.late, late, school.long, long)
 
-            const result = distance <= .5
+            if (selectedSchool == null || distance < selectedSchool._doc.distance) {
+                school._doc.distance = distance
+                selectedSchool = school
+            }
+        }
 
-            if (result) {
-                findSchool = true
-                var mailOptions = {
-                    from: email,
-                    to: school.email,
-                    subject: 'דיווח חדש מל"ב בקליק',
-                    text: `
+        if (selectedSchool != null) {
+
+            var mailOptions = {
+                from: email,
+                to: selectedSchool.email,
+                subject: 'דיווח חדש מל"ב בקליק',
+                text: `
                     שלום רב,
                     התקבל דיווח אירוע חירום מסוג ${type}.
                     להלן פרטים נוספים אודות הדיווח:
@@ -182,22 +187,20 @@ app.post('/', upload.array('files'), async (req, res) => {
                     תודה רבה,
                     מערכת ל"ב בקליק.
                     `,
-                    attachments: []
+                attachments: []
 
-                };
-                for (var i = 0; i < paths.length; i++) {
-                    mailOptions.attachments.push({
-                        filename: i + paths[i].ex,
-                        path: paths[i].url
-                    })
-                }
-                transporter.sendMail(mailOptions)
-                break;
+            };
+            for (var i = 0; i < paths.length; i++) {
+                mailOptions.attachments.push({
+                    filename: i + paths[i].ex,
+                    path: paths[i].url
+                })
             }
+            transporter.sendMail(mailOptions)
         }
 
         res.json({
-            'message': findSchool ? 'האירוע דווח בהצלחה ויטופל על ידי הגורמים הרלוונטים במוסד' : 'אתה לא נמצא באיזור המותר לדיווח אירועים במערכת'
+            'message': selectedSchool != null ? 'האירוע דווח בהצלחה ויטופל על ידי הגורמים הרלוונטים במוסד' : 'אתה לא נמצא באיזור המותר לדיווח אירועים במערכת'
         })
     } catch (e) {
         console.log(e)
