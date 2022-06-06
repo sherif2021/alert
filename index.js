@@ -25,14 +25,14 @@ mongoose.connect(process.env.MONGODB_URI,
 
 
 
-const email = 'maharat.lb.click@gmail.com'
-const emailPassword = 'Maharat1020'
+const email = 'levbklick@outlook.com'
+const emailPassword = 'lick2022'
 
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    host: "smtp.gmail.com",
-    port: 465,
+    service: 'outlook',
+    host: "smtp-mail.outlook.com",
+    port: 587,
     secure: false,
     auth: {
         user: email,
@@ -159,10 +159,6 @@ app.post('/', upload.array('files'), async (req, res) => {
 
             const distance = caclDistance(school.late, late, school.long, long)
 
-            console.log(school._doc.name)
-            console.log(distance)
-            console.log('_________')
-
             if (selectedSchool == null || distance < selectedSchool.distance) {
                 school._doc.distance = distance
                 selectedSchool = school._doc
@@ -170,7 +166,6 @@ app.post('/', upload.array('files'), async (req, res) => {
         }
 
         if (selectedSchool != null) {
-            console.log('selected ' + selectedSchool.name)
             var mailOptions = {
                 from: email,
                 to: selectedSchool.email,
